@@ -1,0 +1,4 @@
+hostname,ip,username,password,device_type,ntp_type
+R1,192.168.194.101,cisco,cisco,cisco_ios,server
+R2,192.168.194.102,cisco,cisco,cisco_ios,client
+R3,192.168.194.103,cisco,cisco,cisco_ios,client
