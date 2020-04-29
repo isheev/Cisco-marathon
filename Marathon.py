@@ -232,7 +232,7 @@ def Check_dev_pid(connection, hostname):
 		print('Error! Unable to check ver on the device ' + hostname)
 		return False
 
-def process_target(device,timestamp):
+def process_target(device,timestamp,result):
 	# This function will be run by each of the processes in parallel
 	# This function implements a logic for a single device using other functions defined above:
 
@@ -249,13 +249,16 @@ def process_target(device,timestamp):
 
 	disconnect_from_device(connection, device['hostname'])
 
-	print(device['hostname'] + '|' + pid + '|' + ver + '|' + npe + '|' + cdp + '|' + ntp)
+	temp_str=device['hostname'] + '|' + pid + '|' + ver + '|' + npe + '|' + cdp + '|' + ntp
+
+	print(temp_str)
+	return temp_str
 
 def main(*args):
 	# This is a main function
 
 	# Enable logs
-	enable_logging()
+	#enable_logging()
 
 	# getting the timestamp string
 	timestamp = get_current_date_and_time()
@@ -266,15 +269,20 @@ def main(*args):
 	# creating a empty list
 	processes=list()
 
+	result = []
 	# Running workers to manage connections
 	with mp.Pool(4) as pool:
 		# Starting several processes...
 		for device in device_list:
-			processes.append(pool.apply_async(process_target, args=(device,timestamp)))
+			processes.append(pool.apply_async(process_target, args=(device,timestamp, result)))
 		# Waiting for results...
 		for process in processes:
-			process.get()
-
+			result.append(process.get())
+	
+	with open(os.path.join(sys.path[0],'result.txt'), 'w') as the_file:
+		the_file.write('\n'.join(result))
+		the_file.close()		
+	#print(result)
 
 if __name__ == '__main__':
 	# checking if we run independently
